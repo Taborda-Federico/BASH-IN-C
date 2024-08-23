@@ -7,9 +7,8 @@
 #include <stdio.h> /* para sprintf */
 #include "command.h"
 #include <glib.h>
-
 #define MAX_LENGTH 257 /* no hay nada como un primo para molestar */
-
+   
 static scommand scmd = NULL; /* para armar scommand temporales */
 
 /* Testeo precondiciones. 
