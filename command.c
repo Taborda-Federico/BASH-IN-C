@@ -6,8 +6,8 @@
 
 struct scommand_s {
     GList *arguments;  // lista de argumentos del comando (lista de gchar*)
-    gchar *input;      // archivo de entrada 
-    gchar *output;     // archivo de salida 
+    char* input;      // archivo de entrada 
+    char* output;     // archivo de salida 
 };
 
 struct pipeline_s {
@@ -36,14 +36,15 @@ scommand scommand_destroy(scommand self){
 void scommand_push_back(scommand self, char * argument) {
     assert(self != NULL && argument != NULL);
     self->arguments = g_list_append(self->arguments, argument);
+   
     assert(!scommand_is_empty(self));
 }
 
 
 void scommand_pop_front(scommand self){
     assert(self!=NULL && !scommand_is_empty(self));
-    Glist *first_arg = g_list_first(self->arguments);
-    g_list_remove_link(self->arguments, first_arg);
+    GList  *first_arg = g_list_first(self->arguments);
+    self->arguments= g_list_remove_link(self->arguments, first_arg);
 }
 
 void scommand_set_redir_in(scommand self, char *filename) {
@@ -69,14 +70,14 @@ bool scommand_is_empty(const scommand self) {
 unsigned int scommand_length(const scommand self){
     assert(self != NULL);
     unsigned int length = 0;
-    length  = g_list_length(self);
+    length  = g_list_length(self->arguments);
     assert((scommand_length(self)==0) == scommand_is_empty(self));
     return length;
 }
 
 char *scommand_front(const scommand self) {
     assert(self != NULL && !scommand_is_empty(self));
-    return (char *)g_list_first(self->arguments)->data;
+    return self->arguments->data;
 }
 
 char * scommand_get_redir_in(const scommand self){
@@ -112,22 +113,117 @@ char *scommand_to_string(const scommand self) {
 }
 
 
-pipeline pipeline_new(void);
+pipeline pipeline_new(void){
 
-pipeline pipeline_destroy(pipeline self);
+    pipeline new_comand = malloc(sizeof(struct pipeline_s));
+    new_comand->commands= NULL;
+    new_comand->wait = true;
+    return new_comand;
+    
 
-void pipeline_push_back(pipeline self, scommand sc);
 
-void pipeline_pop_front(pipeline self);
 
-void pipeline_set_wait(pipeline self, const bool w);
 
-bool pipeline_is_empty(const pipeline self);
 
-unsigned int pipeline_length(const pipeline self);
 
-scommand pipeline_front(const pipeline self);
+}
 
-bool pipeline_get_wait(const pipeline self);
+pipeline pipeline_destroy(pipeline self) {
+    if (self != NULL) {
+        // Primero, asegúrate de que todos los comandos sean destruidos
+        while (!g_list_is_empty(self->commands)) {
+            GList *first_node = g_list_first(self->commands);
+            self->commands = g_list_remove_link(self->commands, first_node);
+            scommand_destroy((scommand)first_node->data);
+            g_list_free(first_node);
+        }
+        // Finalmente, libera la memoria del propio pipeline
+        free(self);
+    }
+    return NULL;
+}
 
-char * pipeline_to_string(const pipeline self);
+void pipeline_push_back(pipeline self, scommand sc){
+
+    assert(sc !=NULL && self !=NULL);
+    self->commands= g_list_append(self->commands, sc); // fun que agrega el elemneto al final de la lista
+}
+
+void pipeline_pop_front(pipeline self){
+
+    assert(self !=NULL && pipeline_is_empty(self));
+    scommand kill_me =self->commands->data  // asigno el primer elmento
+    self->commands = g_list_remove(self->commands, kill_me);
+    scommand_destroy(kill_me); // lo elimino
+
+}
+
+void pipeline_set_wait(pipeline self, const bool w){
+
+if (self == NULL)
+{
+    return; //si es null corta
+}
+
+self->wait = w;
+
+
+}
+
+bool pipeline_is_empty(const pipeline self){
+    assert(self != NULL);
+    return (g_list_length(self->commands) == 0);
+
+}
+
+unsigned int pipeline_length(const pipeline self){
+    assert(self != NULL);
+    return g_list_length(self->commands) ;
+
+
+}
+
+
+
+
+scommand pipeline_front(const pipeline self){
+        if (self == NULL || self->commands == NULL) {
+        return NULL; // Si el pipeline es NULL o no tiene comandos, devuelve NULL.
+    }
+
+     return self->commands->data;
+}
+
+
+
+bool pipeline_get_wait(const pipeline self){
+
+    if (self == NULL)
+    {
+        return false;   
+    }
+    
+    return self->wait;
+
+}
+
+char * pipeline_to_string(const pipeline self){
+      if (self == NULL || self->commands == NULL) {
+        return g_strdup(""); // Devuelve una cadena vacía si el pipeline es NULL o no tiene comandos.
+    }  
+
+    GString *str = g_string_new(NULL);
+    for (GList *i = self->commands; i!=NULL ; i = i->next)
+    {
+      g_string_append(str , (char *)i->data);
+
+      if (i->next  == NULL)
+      {
+        g_string_append(str, '|');
+      }
+      
+    }
+    
+ return g_string_free(str,false);
+
+}
