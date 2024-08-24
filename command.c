@@ -53,6 +53,7 @@ void scommand_set_redir_in(scommand self, char *filename) {
         free(self->input);
     }
     self->input = filename;
+}
 
 void scommand_set_redir_out(scommand self, char *filename) {
     assert(self != NULL);
@@ -71,7 +72,7 @@ unsigned int scommand_length(const scommand self){
     assert(self != NULL);
     unsigned int length = 0;
     length  = g_list_length(self->arguments);
-    assert((scommand_length(self)==0) == scommand_is_empty(self));
+   // assert((scommand_length(self)==0) == scommand_is_empty(self));
     return length;
 }
 
@@ -131,7 +132,7 @@ pipeline pipeline_new(void){
 pipeline pipeline_destroy(pipeline self) {
     if (self != NULL) {
         // Primero, asegúrate de que todos los comandos sean destruidos
-        while (!g_list_is_empty(self->commands)) {
+        while ((g_list_length(self->commands)!=0  )) {
             GList *first_node = g_list_first(self->commands);
             self->commands = g_list_remove_link(self->commands, first_node);
             scommand_destroy((scommand)first_node->data);
@@ -152,7 +153,7 @@ void pipeline_push_back(pipeline self, scommand sc){
 void pipeline_pop_front(pipeline self){
 
     assert(self !=NULL && pipeline_is_empty(self));
-    scommand kill_me =self->commands->data  // asigno el primer elmento
+    scommand kill_me =self->commands->data;  // asigno el primer elmento
     self->commands = g_list_remove(self->commands, kill_me);
     scommand_destroy(kill_me); // lo elimino
 
@@ -219,7 +220,7 @@ char * pipeline_to_string(const pipeline self){
 
       if (i->next  == NULL)
       {
-        g_string_append(str, '|');
+        g_string_append(str, "|");
       }
       
     }
