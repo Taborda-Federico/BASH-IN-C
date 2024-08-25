@@ -213,22 +213,29 @@ bool pipeline_get_wait(const pipeline self){
 
 char * pipeline_to_string(const pipeline self){
       assert(self!=NULL);
-      if (self == NULL || self->commands == NULL) {
+      if (self == NULL ) {
         return g_strdup(""); // Devuelve una cadena vacía si el pipeline es NULL o no tiene comandos.
     }  
-
+    GList *i = self->commands;
+    int index = 0;
     GString *str = g_string_new(NULL);
-    for (GList *i = self->commands; i!=NULL ; i = i->next)
+     int length = g_list_length(i);
+    for (; i!=NULL ; i = i->next, index++)
     {
-      g_string_append(str , (char *)i->data);
+        scommand comando = (scommand)i->data; // i->data a un tipo scommand
+        char *comando_str = scommand_to_string(comando); //comvierte un scomand a una cadena
+        g_string_append(str , comando_str);
+        free(comando_str);
 
-      if (i->next  == NULL)
+      if (index < length -1)
       {
         g_string_append(str, "|");
       }
       
     }
-    
+        if (!self->wait) { 
+        g_string_append(str, " &");
+    }
  return g_string_free(str,false);
 
 }
