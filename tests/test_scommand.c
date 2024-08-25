@@ -98,7 +98,7 @@ START_TEST (test_get_redir_out_null)
 {
     scommand_get_redir_out (NULL);
 }
-END_TEST9
+END_TEST
 
 START_TEST (test_to_string_null)
 {

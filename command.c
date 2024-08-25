@@ -24,13 +24,16 @@ scommand scommand_new(void){
 }
 
 scommand scommand_destroy(scommand self){
-    if(self != NULL){
+    assert(self!=NULL);
+    
         g_list_free_full(self->arguments, free);
         free(self->input);
         free(self->output);
-        free(self);
-    }
+        free(self);  
+    self=NULL;
+    assert(self == NULL);
     return NULL;
+    
 }
 
 void scommand_push_back(scommand self, char * argument) {
@@ -130,6 +133,7 @@ pipeline pipeline_new(void){
 }
 
 pipeline pipeline_destroy(pipeline self) {
+    assert(self!=NULL);
     if (self != NULL) {
         // Primero, asegúrate de que todos los comandos sean destruidos
         while ((g_list_length(self->commands)!=0  )) {
@@ -160,7 +164,7 @@ void pipeline_pop_front(pipeline self){
 }
 
 void pipeline_set_wait(pipeline self, const bool w){
-
+assert(self!=NULL);
 if (self == NULL)
 {
     return; //si es null corta
@@ -184,10 +188,8 @@ unsigned int pipeline_length(const pipeline self){
 
 }
 
-
-
-
 scommand pipeline_front(const pipeline self){
+    assert(self!=NULL && !pipeline_is_empty(self));
         if (self == NULL || self->commands == NULL) {
         return NULL; // Si el pipeline es NULL o no tiene comandos, devuelve NULL.
     }
@@ -198,6 +200,7 @@ scommand pipeline_front(const pipeline self){
 
 
 bool pipeline_get_wait(const pipeline self){
+    assert(self!=NULL);
 
     if (self == NULL)
     {
@@ -209,6 +212,7 @@ bool pipeline_get_wait(const pipeline self){
 }
 
 char * pipeline_to_string(const pipeline self){
+      assert(self!=NULL);
       if (self == NULL || self->commands == NULL) {
         return g_strdup(""); // Devuelve una cadena vacía si el pipeline es NULL o no tiene comandos.
     }  
