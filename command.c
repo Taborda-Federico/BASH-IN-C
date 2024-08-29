@@ -81,7 +81,7 @@ unsigned int scommand_length(const scommand self){
 
 char *scommand_front(const scommand self) {
     assert(self != NULL && !scommand_is_empty(self));
-    return self->arguments->data;
+     return g_list_nth_data(self->arguments,0);       //Rompimos abstracción usamos función para g_list_nth_data para recuperar, antes estaba: return self->arguments->data;
 }
 
 char * scommand_get_redir_in(const scommand self){
@@ -100,7 +100,7 @@ char *scommand_to_string(const scommand self) {
     GString *str = g_string_new(NULL);  
     
     for (GList *i = self->arguments; i != NULL; i = i->next) {
-        g_string_append_printf(str, "%s ", (char *)i->data);
+        g_string_append_printf(str, "%s ", (char *)g_list_nth_data(i,0)); // Aca se rompio abstracción anterior: (char *)i->data);
     }
     
     if (self->input != NULL) {
@@ -125,11 +125,6 @@ pipeline pipeline_new(void){
     return new_comand;
     
 
-
-
-
-
-
 }
 
 pipeline pipeline_destroy(pipeline self) {
@@ -139,7 +134,7 @@ pipeline pipeline_destroy(pipeline self) {
         while ((g_list_length(self->commands)!=0  )) {
             GList *first_node = g_list_first(self->commands);
             self->commands = g_list_remove_link(self->commands, first_node);
-            scommand_destroy((scommand)first_node->data);
+            scommand_destroy((scommand)g_list_nth_data(first_node,0));          //Aca habíamos roto la abstracción lo correjimos codigo anterior:first_node->data
             g_list_free(first_node);
         }
         // Finalmente, libera la memoria del propio pipeline
@@ -157,7 +152,7 @@ void pipeline_push_back(pipeline self, scommand sc){
 void pipeline_pop_front(pipeline self){
 
     assert(self !=NULL && !pipeline_is_empty(self));
-    scommand kill_me =self->commands->data;  // asigno el primer elmento
+    scommand kill_me =g_list_nth_data(self->commands,0);  // asigno el primer elmento, se había roto la abtracción anterior: self->commands->data;
     self->commands = g_list_remove(self->commands, kill_me);
     scommand_destroy(kill_me); // lo elimino
 
@@ -194,7 +189,7 @@ scommand pipeline_front(const pipeline self){
         return NULL; // Si el pipeline es NULL o no tiene comandos, devuelve NULL.
     }
 
-     return self->commands->data;
+     return g_list_nth_data(self->commands,0);    //Se rompio la abstracción anterior:  self->commands->data 
 }
 
 
@@ -222,7 +217,7 @@ char * pipeline_to_string(const pipeline self){
      int length = g_list_length(i);
     for (; i!=NULL ; i = i->next, index++)
     {
-        scommand comando = (scommand)i->data; // i->data a un tipo scommand
+        scommand comando = g_list_nth_data(i,0); // i->data a un tipo scommand, se había roto la abstracción anterior: (scommand)i->data;
         char *comando_str = scommand_to_string(comando); //comvierte un scomand a una cadena
         g_string_append(str , comando_str);
         free(comando_str);
