@@ -29,19 +29,6 @@ bool builtin_alone(pipeline p) {
     }
     return check;
 }
-/*
- * Indica si el pipeline tiene solo un elemento y si este se corresponde a un
- * comando interno.
- *
- * REQUIRES: p != NULL
- *
- * ENSURES:
- *
- * builtin_alone(p) == pipeline_length(p) == 1 &&
- *                     builtin_is_internal(pipeline_front(p))
- *
- *
- */
 
 void builtin_run(scommand cmd) {
 
@@ -89,11 +76,5 @@ void builtin_run(scommand cmd) {
         }
     }
 }
-/*
- * Ejecuta un comando interno
- *
- * REQUIRES: {builtin_is_internal(cmd)}
- *
- */
 
 
