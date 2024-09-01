@@ -8,7 +8,6 @@
 #include "builtin.h"
 #include "obfuscated.h"
 #include <glib.h>
-//Modificaciones de Prueba
 
 static void show_prompt(void) {
     printf ("mybash> ");
@@ -20,20 +19,27 @@ int main(int argc, char *argv[]) {
     Parser input;
     bool quit = false;
 
-    input = parser_new(stdin);
+    input = parser_new(stdin); // Inicializa el parser para leer comandos de stdin
     while (!quit) {
-        ping_pong_loop(NULL);
-        show_prompt();
-        pipe = parse_pipeline(input);
+        ping_pong_loop(NULL);  // Llamada a cualquier función adicional que necesites
+        show_prompt();         // Muestra el prompt
+        pipe = parse_pipeline(input); // Analiza el input y crea el pipeline
 
-        /* Hay que salir luego de ejecutar? */
-        quit = parser_at_eof(input);
-        /*
-         * COMPLETAR
-         *
-         */
+        if (pipe != NULL && !pipeline_is_empty(pipe)) { 
+            // Verifica si hay que salir (ejemplo: el comando es 'exit')
+            scommand first_command = pipeline_front(pipe);
+            if (builtin_is_internal(first_command) && strcmp(scommand_front(first_command), "exit") == 0) {
+                quit = true;  // Si es el comando 'exit', establece quit en true
+            } else {
+                execute_pipeline(pipe);  // Ejecuta el pipeline de comandos
+            }
+            pipeline_destroy(pipe);  // Limpia el pipeline después de su ejecución
+        }
+
+        // Verifica si es necesario salir del shell
+        quit = quit || parser_at_eof(input);
     }
-    parser_destroy(input); input = NULL;
+
+    parser_destroy(input); // Libera recursos del parser
     return EXIT_SUCCESS;
 }
-
