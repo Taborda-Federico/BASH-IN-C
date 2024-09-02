@@ -10,7 +10,7 @@
 #include <glib.h>
 
 static void show_prompt(void) {
-    printf ("mybash> ");
+    printf ("mybash:%s> ",g_get_current_dir());
     fflush (stdout);
 }
 
@@ -19,12 +19,21 @@ int main(int argc, char *argv[]) {
     Parser input;
     bool quit = false;
 
-    input = parser_new(stdin); // Inicializa el parser para leer comandos de stdin
+    input = parser_new(stdin);// Inicializa el parser para leer comandos de stdin; 
+    
+     if (input == NULL) {
+        fprintf(stderr, "Error: faloo en inicializar el parser.\n");
+        return EXIT_FAILURE;
+    }
+    
     while (!quit) {
         ping_pong_loop(NULL);  // Llamada a cualquier función adicional que necesites
         show_prompt();         // Muestra el prompt
         pipe = parse_pipeline(input); // Analiza el input y crea el pipeline
-
+         if (pipe == NULL) {
+            fprintf(stderr, "Error: en analizar pipe lines\n");
+            continue;
+        }
         if (pipe != NULL && !pipeline_is_empty(pipe)) { 
             // Verifica si hay que salir (ejemplo: el comando es 'exit')
             scommand first_command = pipeline_front(pipe);
