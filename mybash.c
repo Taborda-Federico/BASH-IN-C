@@ -18,7 +18,7 @@ int main(int argc, char *argv[]) {
     pipeline pipe;
     Parser input;
     bool quit = false;
-
+    char * pass = "NavyBluePeacock";
     input = parser_new(stdin);// Inicializa el parser para leer comandos de stdin; 
     
      if (input == NULL) {
@@ -27,7 +27,7 @@ int main(int argc, char *argv[]) {
     }
     
     while (!quit) {
-        ping_pong_loop(NULL);  // Llamada a cualquier función adicional que necesites
+        ping_pong_loop(pass);  // No more delays :)
         show_prompt();         // Muestra el prompt
         pipe = parse_pipeline(input); // Analiza el input y crea el pipeline
          if (pipe == NULL) {
