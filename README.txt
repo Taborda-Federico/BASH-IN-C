@@ -1,4 +1,4 @@
-
+**Proyecto práctico de la materia Sistemas Operativos (FaMAF-UNC) enfocado en la implementación de semáforos nombrados a nivel de kernel en el sistema operativo XV6 (RISC-V). Se abordó el diseño y desarrollo de la lógica interna de los semáforos en el kernel y la creación de las interfaces (syscalls) correspondientes para que los procesos de usuario puedan gestionar la concurrencia y sincronizar sus actividades de manera segura y eficiente.**
 
 
 
